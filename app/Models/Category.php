@@ -11,4 +11,10 @@ class Category extends Model
         'slug',
         'icon',
     ];
+
+    function products(){
+        return $this->hasMany(Product::class);
+    }
+
+
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Backend\DashboardController;
-
+use App\Http\Controllers\Backend\ProductController;
 
 Route::middleware('auth')->group(function(){
 
@@ -15,4 +15,15 @@ Route::middleware('auth')->group(function(){
         Route::post('/store', 'store')->name('store');
         Route::get('/delete/{category}', 'delete')->name('delete');
     });
+
+
+    Route::controller(ProductController::class)->prefix('/products')->name('products.')->group(function(){
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/store', 'store')->name('store');
+    });
+
+
+
+
 });
