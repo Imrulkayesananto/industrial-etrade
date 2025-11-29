@@ -48,8 +48,12 @@
                         <div class="header-top-link">
                             <ul class="quick-link">
                                 <li><a href="index-1.html#">Help</a></li>
-                                <li><a href="sign-up.html">Join Us</a></li>
-                                <li><a href="sign-in.html">Sign In</a></li>
+                                @auth('customer')
+                                <li><a href="{{ route('frontend.customer.profile') }}">My Account</a></li>
+                                @else
+                                <li><a href="{{ route('frontend.customer.register') }}">Join Us</a></li>
+                                <li><a href="{{ route('frontend.customer.login') }}">Sign In</a></li>
+                                @endauth
                             </ul>
                         </div>
                     </div>
@@ -85,8 +89,8 @@
                                 <li class="menu-item">
                                     <a href="{{ 'shop' }}">Shop</a>
                                 </li>
-                                
-                           
+
+
                                 <li><a href="about-us.html">About</a></li>
                                 <li class="menu-item-has-children">
                                     <a href="index-1.html#">Blog</a>
@@ -119,7 +123,7 @@
                             </li>
                             <li class="shopping-cart">
                                 <a href="index-1.html#" class="cart-dropdown-btn">
-                                    <span class="cart-count">3</span>
+                                    <span class="cart-count">{{ $carts['count'] }}</span>
                                     <i class="flaticon-shopping-cart"></i>
                                 </a>
                             </li>
@@ -164,7 +168,7 @@
     </header>
 
     <main class="main-wrapper">
-      @yield('frontend')
+        @yield('frontend')
     </main>
 
 
@@ -607,11 +611,16 @@
                 <button class="cart-close sidebar-close"><i class="fas fa-times"></i></button>
             </div>
             <div class="cart-body">
+                @if (isset($carts['data']))
                 <ul class="cart-item-list">
+                    @php
+                    $totalPrice = 0
+                    @endphp
+                    @foreach ($carts['data'] as $cartItem)
                     <li class="cart-item">
                         <div class="item-img">
                             <a href="single-product.html"><img
-                                    src="{{ asset('frontend/assets/images/product/electric/product-01.png')}}"
+                                    src="{{ asset('storage/'. $cartItem->product->featured_img)}}"
                                     alt="Commodo Blown Lamp"></a>
                             <button class="close-btn"><i class="fas fa-times"></i></button>
                         </div>
@@ -626,73 +635,35 @@
                                 </span>
                                 <span class="rating-number">(64)</span>
                             </div>
-                            <h3 class="item-title"><a href="single-product-3.html">Wireless PS Handler</a></h3>
-                            <div class="item-price"><span class="currency-symbol">$</span>155.00</div>
+                            <h3 class="item-title"><a href="single-product-3.html">{{ $cartItem->product->title }}</a>
+                            </h3>
+                            @php
+                            $price = ($cartItem->product->selling_price && $cartItem->product->selling_price > 0?
+                            $cartItem->product->selling_price :
+                            $cartItem->product->price ) * $cartItem->qty;
+                            $totalPrice += $price;
+                            @endphp
+                            <div class="item-price"><span class="currency-symbol">BDT</span> {{ number_format($price,2)
+                                }}</div>
                             <div class="pro-qty item-quantity">
-                                <input type="number" class="quantity-input" value="15">
+                                <input type="number" class="quantity-input" value="{{ $cartItem->qty }}">
                             </div>
                         </div>
                     </li>
-                    <li class="cart-item">
-                        <div class="item-img">
-                            <a href="single-product-2.html"><img
-                                    src="{{ asset('frontend/assets/images/product/electric/product-02.png')}}"
-                                    alt="Commodo Blown Lamp"></a>
-                            <button class="close-btn"><i class="fas fa-times"></i></button>
-                        </div>
-                        <div class="item-content">
-                            <div class="product-rating">
-                                <span class="icon">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
-                                <span class="rating-number">(4)</span>
-                            </div>
-                            <h3 class="item-title"><a href="single-product-2.html">Gradient Light Keyboard</a></h3>
-                            <div class="item-price"><span class="currency-symbol">$</span>255.00</div>
-                            <div class="pro-qty item-quantity">
-                                <input type="number" class="quantity-input" value="5">
-                            </div>
-                        </div>
-                    </li>
-                    <li class="cart-item">
-                        <div class="item-img">
-                            <a href="single-product-3.html"><img
-                                    src="{{ asset('frontend/assets/images/product/electric/product-03.png')}}"
-                                    alt="Commodo Blown Lamp"></a>
-                            <button class="close-btn"><i class="fas fa-times"></i></button>
-                        </div>
-                        <div class="item-content">
-                            <div class="product-rating">
-                                <span class="icon">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
-                                <span class="rating-number">(6)</span>
-                            </div>
-                            <h3 class="item-title"><a href="single-product.html">HD CC Camera</a></h3>
-                            <div class="item-price"><span class="currency-symbol">$</span>200.00</div>
-                            <div class="pro-qty item-quantity">
-                                <input type="number" class="quantity-input" value="100">
-                            </div>
-                        </div>
-                    </li>
+                    @endforeach
+
                 </ul>
+                @endif
             </div>
             <div class="cart-footer">
                 <h3 class="cart-subtotal">
                     <span class="subtotal-title">Subtotal:</span>
-                    <span class="subtotal-amount">$610.00</span>
+                    <span class="subtotal-amount">BDT {{ number_format($totalPrice,2) }}</span>
                 </h3>
                 <div class="group-btn">
                     <a href="cart.html" class="axil-btn btn-bg-primary viewcart-btn">View Cart</a>
-                    <a href="checkout.html" class="axil-btn btn-bg-secondary checkout-btn">Checkout</a>
+                    <a href="{{ route('frontend.checkout') }}"
+                        class="axil-btn btn-bg-secondary checkout-btn">Checkout</a>
                 </div>
             </div>
         </div>
